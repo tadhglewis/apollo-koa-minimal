@@ -32,7 +32,7 @@ const httpServer = http.createServer(app.callback());
  */
 const createRootFieldBlocker = (blockOver) => ({
   requestDidStart: async () => ({
-    validationDidStart: async (requestContext) => {
+    didResolveOperation: async (requestContext) => {
       if (requestContext.operation.selectionSet.selections.length > blockOver) {
         throw new GraphQLError(
           "Query over complexity limit. Root level queries can not be >100"
@@ -48,6 +48,8 @@ const server = new ApolloServer({
   resolvers,
   plugins: [
     ApolloServerPluginDrainHttpServer({ httpServer }),
+    // This is meant to reject requests with >100 root level queries
+    // however before we can reject it, somewhat is taking a long time to process.
     createRootFieldBlocker(100),
   ],
 });
