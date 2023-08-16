@@ -6,6 +6,7 @@ import { ApolloServer } from "@apollo/server";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { koaMiddleware } from "@as-integrations/koa";
 import { InMemoryLRUCache } from "@apollo/utils.keyvaluecache";
+import { GraphQLError } from "graphql";
 
 // The GraphQL schema
 const typeDefs = `#graphql
@@ -24,11 +25,31 @@ const resolvers = {
 const app = new Koa();
 const httpServer = http.createServer(app.callback());
 
+/**
+ * Blocks requests over `blockOver` to avoid potentially DoS level queries
+ * @param {number} blockOver
+ * @returns void
+ */
+const createRootFieldBlocker = (blockOver) => ({
+  requestDidStart: async () => ({
+    validationDidStart: async (requestContext) => {
+      if (requestContext.operation.selectionSet.selections.length > blockOver) {
+        throw new GraphQLError(
+          "Query over complexity limit. Root level queries can not be >100"
+        );
+      }
+    },
+  }),
+});
+
 // Set up Apollo Server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    createRootFieldBlocker(100),
+  ],
 });
 await server.start();
 
