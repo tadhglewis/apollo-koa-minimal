@@ -26,15 +26,10 @@ const maliciousQuery = `{ ${"__typename ".repeat(1000)}}`;
 
 const startTime = performance.now();
 
-graphql({ schema, source: maliciousQuery }).then((result) => {
-  // Prints
-  // {
-  //   data: { hello: "world" }
-  // }
+const result = await graphql({ schema, source: maliciousQuery });
 
-  const endTime = performance.now();
+const endTime = performance.now();
 
-  console.log(`Took ${endTime - startTime} milliseconds`);
+console.log(`Took ${endTime - startTime} milliseconds`);
 
-  console.log(JSON.stringify(result));
-});
+console.log(JSON.stringify(result));
