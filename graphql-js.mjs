@@ -6,7 +6,7 @@ import {
   GraphQLString,
 } from "graphql";
 
-var schema = new GraphQLSchema({
+const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
