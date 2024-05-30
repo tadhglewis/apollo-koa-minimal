@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/server": "4.9.1",
+    "@apollo/server": "4.9.3",
     "@apollo/utils.keyvaluecache": "^3.0.0",
     "@as-integrations/koa": "1.1.1",
     "@koa/cors": "5.0.0",
